@@ -5,6 +5,7 @@ from datetime import datetime
 #define our data
 data=b"SECRETDATA"
 
+
 output = f"output/encryptedfile{datetime.now()}.bin"
 
 key = get_random_bytes(16)
