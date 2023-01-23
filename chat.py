@@ -33,28 +33,31 @@ def connect(ip, port):
     return client
 
 
-def sending_messages(c):
-    """
+def sending_messages(c, input_prompt):
+     """
     Sends messages to the connected client
     :param c: The client socket
+    :param input_prompt: The prompt to be displayed before sending a message
     :return: None
     """
     while True:
-        message = input(">>")
+        message = input(input_prompt)
         c.send(message.encode())
         print("You: " + message)
 
 
-def receiving_messages(c):
+def receiving_messages(c, input_prompt):
     """
     Receives messages from the connected client
     :param c: The client socket
+    :param input_prompt: The prompt to be displayed after receiving a message
     :return: None
     """
     while True:
         data = c.recv(1024).decode()
         if data != "":
             print("Partner: " + data)
+            print(input_prompt)
 
 
 def display_ip():
@@ -66,6 +69,7 @@ def display_ip():
     ip_address = socket.gethostbyname(hostname)
     print("Your IP address is: " + Fore.RED + ip_address + Style.RESET_ALL)
 
+input_prompt = ">>"
 
 choice = input("Do you want to host (1) or to connect (2): ")
 if choice == "1":
