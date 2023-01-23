@@ -1,6 +1,8 @@
 import socket
 import threading
 
+from colorama import Fore, Style
+
 
 def listen(ip, port):
     """
@@ -28,7 +30,7 @@ def connect(ip, port):
 
 def sending_messages(c):
     while True:
-        message = input("")
+        message = input(">>")
         c.send(message.encode())
         print("You: " + message)
 
@@ -39,9 +41,14 @@ def receiving_messages(c):
         if data != "":
             print("Partner: " + data)
 
+def display_ip():
+    hostname = socket.gethostname()
+    ip_address = socket.gethostbyname(hostname)
+    print(Fore.RED + "The IP address of this system is: " + ip_address + Style.RESET_ALL)
 
 choice = input("Do you want to host (1) or to connect (2): ")
 if choice == "1":
+    display_ip()
     client, _ = listen("0.0.0.0", 9999)
 
 elif choice == "2":
