@@ -6,8 +6,10 @@ from colorama import Fore, Style
 
 def listen(ip, port):
     """
-    Listens on the specified port for an incoming connection.
-    IP is optional
+    Listens on the specified IP and port for an incoming connection.
+    :param ip: The IP address to listen on. Default is '0.0.0.0'
+    :param port: The port to listen on
+    :return: A tuple containing the client socket and the address of the client
     """
     if ip == "":
         ip = "0.0.0.0"
@@ -16,19 +18,27 @@ def listen(ip, port):
     server.bind((ip, port))
     server.listen()
 
-    # client, _ = server.accept()
     return server.accept()
 
 
 def connect(ip, port):
     """
-    Connects to another client using the given port and IP.
+    Connects to another client using the given IP and port.
+    :param ip: The IP address of the other client
+    :param port: The port of the other client
+    :return: None
     """
-    # client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client.connect((ip, port))
+    return client
 
 
 def sending_messages(c):
+    """
+    Sends messages to the connected client
+    :param c: The client socket
+    :return: None
+    """
     while True:
         message = input(">>")
         c.send(message.encode())
@@ -36,15 +46,26 @@ def sending_messages(c):
 
 
 def receiving_messages(c):
+    """
+    Receives messages from the connected client
+    :param c: The client socket
+    :return: None
+    """
     while True:
         data = c.recv(1024).decode()
         if data != "":
             print("Partner: " + data)
 
+
 def display_ip():
+    """
+    Display the IP address of the system in red
+    :return: None
+    """
     hostname = socket.gethostname()
     ip_address = socket.gethostbyname(hostname)
-    print(Fore.RED + "The IP address of this system is: " + ip_address + Style.RESET_ALL)
+    print("Your IP address is: " + Fore.RED + ip_address + Style.RESET_ALL)
+
 
 choice = input("Do you want to host (1) or to connect (2): ")
 if choice == "1":
@@ -52,8 +73,7 @@ if choice == "1":
     client, _ = listen("0.0.0.0", 9999)
 
 elif choice == "2":
-    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    connect("localhost", 9999)
+    client = connect("localhost", 9999)
 
 threading.Thread(target=sending_messages, args=(client,)).start()
 threading.Thread(target=receiving_messages, args=(client,)).start()
