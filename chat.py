@@ -13,6 +13,8 @@ def listen(ip, port):
     """
     if ip == "":
         ip = "0.0.0.0"
+    if port == "":
+        port = "9999"
 
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.bind((ip, port))
@@ -28,18 +30,20 @@ def connect(ip, port):
     :param port: The port of the other client
     :return: None
     """
+
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client.connect((ip, port))
     return client
 
 
 def sending_messages(c, input_prompt):
-     """
+    """
     Sends messages to the connected client
     :param c: The client socket
     :param input_prompt: The prompt to be displayed before sending a message
     :return: None
     """
+
     while True:
         message = input(input_prompt)
         c.send(message.encode())
@@ -69,15 +73,43 @@ def display_ip():
     ip_address = socket.gethostbyname(hostname)
     print("Your IP address is: " + Fore.RED + ip_address + Style.RESET_ALL)
 
+
+def is_valid_ip_port(ip_port):
+    """
+    Check if the given IP address and port are valid
+    :param ip_port: The IP address and port to check in the format "ip:port"
+    :return: True if the IP address and port are valid, False otherwise
+    """
+    try:
+        ip, port = ip_port.split(':')
+        socket.inet_pton(socket.AF_INET, ip)
+        if 0 <= int(port) <= 65535:
+            return True
+        else:
+            return False
+    except (socket.error, ValueError):
+        return False
+
+
 input_prompt = ">>"
 
 choice = input("Do you want to host (1) or to connect (2): ")
 if choice == "1":
     display_ip()
-    client, _ = listen("0.0.0.0", 9999)
+    ip_port = input("Enter the IP and port to listen on (default is: 0.0.0.0:9999): ")
+    if is_valid_ip_port(ip_port):
+        ip, port = ip_port.split(":")
+        client, _ = listen(ip, int(port))
+    else:
+        print("Invalid IP address or port")
 
 elif choice == "2":
-    client = connect("localhost", 9999)
+    ip_port = input("Enter the IP and port to connect to (e.g. 0.0.0.0:9999): ")
+    if is_valid_ip_port(ip_port):
+        ip, port = ip_port.split(":")
+        client = connect(ip, int(port))
+    else:
+        print("Invalid IP address or port")
 
 threading.Thread(target=sending_messages, args=(client,)).start()
 threading.Thread(target=receiving_messages, args=(client,)).start()
