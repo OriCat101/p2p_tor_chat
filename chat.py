@@ -11,10 +11,10 @@ def listen(ip, port):
     :param port: The port to listen on
     :return: A tuple containing the client socket and the address of the client
     """
-    if ip == "":
-        ip = "0.0.0.0"
-    if port == "":
-        port = "9999"
+    #if ip == "":
+    #    ip = "0.0.0.0"
+    #if port == "":
+    #    port = "9999"
 
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.bind((ip, port))
@@ -71,7 +71,7 @@ def display_ip():
     """
     hostname = socket.gethostname()
     ip_address = socket.gethostbyname(hostname)
-    print("Your IP address is: " + Fore.RED + ip_address + Style.RESET_ALL)
+    return ip_address
 
 
 def is_valid_ip_port(ip_port):
@@ -95,8 +95,10 @@ input_prompt = ">>"
 
 choice = input("Do you want to host (1) or to connect (2): ")
 if choice == "1":
-    display_ip()
+    print("Your IP address is: " + Fore.RED + display_ip() + Style.RESET_ALL)
     ip_port = input("Enter the IP and port to listen on (default is: 0.0.0.0:9999): ")
+    if ip_port == "":
+        ip_port = "0.0.0.0:9999"
     if is_valid_ip_port(ip_port):
         ip, port = ip_port.split(":")
         client, _ = listen(ip, int(port))
